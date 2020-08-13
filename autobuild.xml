@@ -1,77 +1,10 @@
 <?xml version="1.0" ?>
 <llsd>
 <map>
-    <key>installables</key>
-    <map>
-      <key>libpng</key>
-      <map>
-        <key>copyright</key>
-        <string>Copyright (c) 1995-2019 The PNG Reference Library Authors</string>
-        <key>description</key>
-        <string>PNG Reference library</string>
-        <key>license</key>
-        <string>libpng</string>
-        <key>license_file</key>
-        <string>LICENSES/libpng.txt</string>
-        <key>name</key>
-        <string>libpng</string>
-        <key>platforms</key>
-        <map>
-          <key>linux64</key>
-          <map>
-            <key>archive</key>
-            <map>
-              <key>hash</key>
-              <string>95f4fee252feb17168597f45f0f0b68d</string>
-              <key>hash_algorithm</key>
-              <string>md5</string>
-              <key>url</key>
-              <string>https://pkg.alchemyviewer.org/repository/autobuild-external/libpng/linux64/debian10/libpng-1.6.37.202201824-linux64-202201824.tar.bz2</string>
-            </map>
-            <key>name</key>
-            <string>linux64</string>
-          </map>
-        </map>
-        <key>version</key>
-        <string>1.6.37.202201824</string>
-      </map>
-      <key>zlib</key>
-      <map>
-        <key>copyright</key>
-        <string>Copyright (C) 1995-2017 Jean-loup Gailly and Mark Adler</string>
-        <key>description</key>
-        <string>Zlib Data Compression Library</string>
-        <key>license</key>
-        <string>zlib</string>
-        <key>license_file</key>
-        <string>LICENSES/zlib.txt</string>
-        <key>name</key>
-        <string>zlib</string>
-        <key>platforms</key>
-        <map>
-          <key>linux64</key>
-          <map>
-            <key>archive</key>
-            <map>
-              <key>hash</key>
-              <string>5d7866be22eaca6d38cfd0bb4e411fb0</string>
-              <key>hash_algorithm</key>
-              <string>md5</string>
-              <key>url</key>
-              <string>https://pkg.alchemyviewer.org/repository/autobuild-external/zlib/linux64/debian10/zlib-1.2.11.202200500-linux64-202200500.tar.bz2</string>
-            </map>
-            <key>name</key>
-            <string>linux64</string>
-          </map>
-        </map>
-        <key>version</key>
-        <string>1.2.11.202200500</string>
-      </map>
-    </map>
     <key>package_description</key>
     <map>
       <key>copyright</key>
-      <string>Copyright (C) 1997-2012 Sam Lantinga</string>
+      <string>Copyright (C) 1997-2020 Sam Lantinga (slouken@libsdl.org)</string>
       <key>description</key>
       <string>Simple DirectMedia Layer is a cross-platform multimedia library designed to provide low level access to audio, keyboard, mouse, joystick, 3D hardware via OpenGL, and 2D video framebuffer.</string>
       <key>license</key>
@@ -105,8 +38,7 @@
           </map>
           <key>manifest</key>
           <array>
-            <string>include/SDL/*</string>
-            <string>docs/SDL/README.Linden</string>
+            <string>include/SDL2/*</string>
           </array>
           <key>name</key>
           <string>common</string>
@@ -128,8 +60,8 @@
           </map>
           <key>manifest</key>
           <array>
-            <string>lib/release/*so*</string>
-            <string>lib/debug/*so*</string>
+            <string>lib/release/*.so*</string>
+            <string>lib/debug/*.so*</string>
           </array>
           <key>name</key>
           <string>linux</string>

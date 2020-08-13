@@ -7,8 +7,8 @@ set -e
 
 TOP="$(dirname "$0")"
 
-SDL_SOURCE_DIR="SDL"
-SDL_VERSION=$(sed -n -e 's/^Version: //p' "$TOP/$SDL_SOURCE_DIR/SDL.spec")
+SDL_SOURCE_DIR="SDL2"
+SDL_VERSION=$(sed -n -e 's/^Version: //p' "$TOP/$SDL_SOURCE_DIR/SDL2.spec")
 
 if [ -z "$AUTOBUILD" ] ; then
     fail
@@ -24,11 +24,6 @@ eval "$("$AUTOBUILD" source_environment)"
 set -x
 
 stage="$(pwd)"
-ZLIB_INCLUDE="${stage}"/packages/include/zlib
-PNG_INCLUDE="${stage}"/packages/include/libpng16
-
-[ -f "$ZLIB_INCLUDE"/zlib.h ] || fail "You haven't installed the zlib package yet."
-[ -f "$PNG_INCLUDE"/png.h ] || fail "You haven't installed the libpng package yet."
 
 # Restore all .sos
 restore_sos ()
@@ -90,12 +85,14 @@ case "$AUTOBUILD_PLATFORM" in
         done
         
         pushd "$TOP/$SDL_SOURCE_DIR"
+        ./autogen.sh
+
         # do debug build of sdl
         PATH="$stage"/bin/:"$PATH" \
-        CFLAGS="-I"$ZLIB_INCLUDE" -I"$PNG_INCLUDE" $DEBUG_CFLAGS" \
-        CXXFLAGS="-I"$ZLIB_INCLUDE" -I"$PNG_INCLUDE" $DEBUG_CXXFLAGS" \
-        CPPFLAGS="-I"$ZLIB_INCLUDE" -I"$PNG_INCLUDE" $DEBUG_CPPFLAGS" \
-        LDFLAGS="-L"$stage/packages/lib/debug" -L"$stage/lib/debug" $opts" \
+        CFLAGS="$DEBUG_CFLAGS" \
+        CXXFLAGS="$DEBUG_CXXFLAGS" \
+        CPPFLAGS="$DEBUG_CPPFLAGS" \
+        LDFLAGS="$opts" \
         ./configure --with-pic \
         --prefix="$stage" --libdir="$stage/lib/debug" --includedir="$stage/include"
         make -j$JOBS
@@ -106,10 +103,10 @@ case "$AUTOBUILD_PLATFORM" in
         
         # do release build of sdl
         PATH="$stage"/bin/:"$PATH" \
-        CFLAGS="-I"$ZLIB_INCLUDE" -I"$PNG_INCLUDE" $RELEASE_CFLAGS" \
-        CXXFLAGS="-I"$ZLIB_INCLUDE" -I"$PNG_INCLUDE" $RELEASE_CXXFLAGS" \
-        CPPFLAGS="-I"$ZLIB_INCLUDE" -I"$PNG_INCLUDE" $RELEASE_CPPFLAGS" \
-        LDFLAGS="-L"$stage/packages/lib/release" -L"$stage/lib/release" $opts" \
+        CFLAGS="$RELEASE_CFLAGS" \
+        CXXFLAGS="$RELEASE_CXXFLAGS" \
+        CPPFLAGS="$RELEASE_CPPFLAGS" \
+        LDFLAGS="$opts" \
         ./configure --with-pic \
         --prefix="$stage" --libdir="$stage/lib/release" --includedir="$stage/include"
         make -j$JOBS
@@ -127,7 +124,5 @@ esac
 
 
 mkdir -p "$stage/LICENSES"
-cp "$TOP/$SDL_SOURCE_DIR/COPYING" "$stage/LICENSES/SDL.txt"
-mkdir -p "$stage"/docs/SDL/
-cp -a "$TOP"/README.Linden "$stage"/docs/SDL/
+cp "$TOP/$SDL_SOURCE_DIR/COPYING.txt" "$stage/LICENSES/SDL.txt"
 echo "$SDL_VERSION" > "$stage/VERSION.txt"
