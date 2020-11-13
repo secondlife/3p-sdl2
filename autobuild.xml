@@ -38,10 +38,34 @@
           </map>
           <key>manifest</key>
           <array>
+            <string>LICENSES/SDL2.txt</string>
             <string>include/SDL2/*</string>
           </array>
           <key>name</key>
           <string>common</string>
+        </map>
+        <key>darwin</key>
+        <map>
+          <key>configurations</key>
+          <map>
+            <key>Release</key>
+            <map>
+              <key>build</key>
+              <map>
+              </map>
+              <key>default</key>
+              <string>True</string>
+              <key>name</key>
+              <string>Release</string>
+            </map>
+          </map>
+          <key>manifest</key>
+          <array>
+            <string>lib/release/*.*</string>
+            <string>lib/debug/*.*</string>
+          </array>
+          <key>name</key>
+          <string>darwin</string>
         </map>
         <key>linux</key>
         <map>
