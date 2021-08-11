@@ -233,5 +233,5 @@ esac
 
 
 mkdir -p "$stage/LICENSES"
-cp "$TOP/$SDL_SOURCE_DIR/COPYING.txt" "$stage/LICENSES/SDL2.txt"
+cp "$TOP/$SDL_SOURCE_DIR/LICENSE.txt" "$stage/LICENSES/SDL2.txt"
 echo "$SDL_VERSION" > "$stage/VERSION.txt"
