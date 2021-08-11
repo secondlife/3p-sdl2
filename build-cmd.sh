@@ -38,7 +38,7 @@ restore_sos ()
 case "$AUTOBUILD_PLATFORM" in
     darwin*)
         # Setup osx sdk platform
-        SDKNAME="macosx10.15"
+        SDKNAME="macosx"
         export SDKROOT=$(xcodebuild -version -sdk ${SDKNAME} Path)
         export MACOSX_DEPLOYMENT_TARGET=10.13
 
@@ -53,8 +53,8 @@ case "$AUTOBUILD_PLATFORM" in
         RELEASE_CXXFLAGS="$RELEASE_COMMON_FLAGS -std=c++17"
         DEBUG_CPPFLAGS="-DPIC"
         RELEASE_CPPFLAGS="-DPIC"
-        DEBUG_LDFLAGS="$ARCH_FLAGS $SDK_FLAGS -Wl,-headerpad_max_install_names -Wl,-macos_version_min,$MACOSX_DEPLOYMENT_TARGET"
-        RELEASE_LDFLAGS="$ARCH_FLAGS $SDK_FLAGS -Wl,-headerpad_max_install_names -Wl,-macos_version_min,$MACOSX_DEPLOYMENT_TARGET"
+        DEBUG_LDFLAGS="$ARCH_FLAGS $SDK_FLAGS -Wl,-headerpad_max_install_names"
+        RELEASE_LDFLAGS="$ARCH_FLAGS $SDK_FLAGS -Wl,-headerpad_max_install_names"
 
         mkdir -p "$stage/include/SDL2"
         mkdir -p "$stage/lib/debug"
