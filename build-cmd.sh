@@ -174,8 +174,6 @@ case "$AUTOBUILD_PLATFORM" in
         RELEASE_CXXFLAGS="$RELEASE_COMMON_FLAGS -std=c++17"
         DEBUG_CPPFLAGS="-DPIC"
         RELEASE_CPPFLAGS="-DPIC"
-
-        JOBS=`cat /proc/cpuinfo | grep processor | wc -l`
         
         # Handle any deliberate platform targeting
         if [ -z "${TARGET_CPPFLAGS:-}" ]; then
@@ -206,7 +204,7 @@ case "$AUTOBUILD_PLATFORM" in
         LDFLAGS="$opts" \
         ./configure --with-pic \
         --prefix="$stage" --libdir="$stage/lib/debug" --includedir="$stage/include"
-        make -j$JOBS
+        make -j$AUTOBUILD_CPU_COUNT
         make install
         
         # clean the build tree
@@ -220,7 +218,7 @@ case "$AUTOBUILD_PLATFORM" in
         LDFLAGS="$opts" \
         ./configure --with-pic \
         --prefix="$stage" --libdir="$stage/lib/release" --includedir="$stage/include"
-        make -j$JOBS
+        make -j$AUTOBUILD_CPU_COUNT
         make install
         
         # clean the build tree
