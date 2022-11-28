@@ -125,7 +125,6 @@ case "$AUTOBUILD_PLATFORM" in
             CPPFLAGS="$DEBUG_CPPFLAGS" \
             LDFLAGS="$DEBUG_LDFLAGS" \
             cmake .. -GNinja -DCMAKE_BUILD_TYPE="Debug" \
-                -DCMAKE_BUILD_TYPE=Debug \
                 -DCMAKE_C_FLAGS="$DEBUG_CFLAGS" \
                 -DCMAKE_CXX_FLAGS="$DEBUG_CXXFLAGS" \
                 -DCMAKE_XCODE_ATTRIBUTE_GCC_OPTIMIZATION_LEVEL="0" \
@@ -153,8 +152,7 @@ case "$AUTOBUILD_PLATFORM" in
             CXXFLAGS="$RELEASE_CXXFLAGS" \
             CPPFLAGS="$RELEASE_CPPFLAGS" \
             LDFLAGS="$RELEASE_LDFLAGS" \
-            cmake .. -GNinja-DCMAKE_BUILD_TYPE="Release" \
-                -DCMAKE_BUILD_TYPE=Release \
+            cmake .. -GNinja -DCMAKE_BUILD_TYPE="Release" \
                 -DCMAKE_C_FLAGS="$RELEASE_CFLAGS" \
                 -DCMAKE_CXX_FLAGS="$RELEASE_CXXFLAGS" \
                 -DCMAKE_XCODE_ATTRIBUTE_GCC_OPTIMIZATION_LEVEL=3 \
