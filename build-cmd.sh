@@ -1,29 +1,33 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # turn on verbose debugging output for parabuild logs.
-set -x
+exec 4>&1; export BASH_XTRACEFD=4; set -x
 # make errors fatal
 set -e
+# complain about undefined vars
+set -u
+
+if [ -z "$AUTOBUILD" ] ; then
+    exit 1
+fi
+
+if [ "$OSTYPE" = "cygwin" ] ; then
+    autobuild="$(cygpath -u $AUTOBUILD)"
+else
+    autobuild="$AUTOBUILD"
+fi
 
 TOP="$(dirname "$0")"
 
 SDL_SOURCE_DIR="SDL2"
 SDL_VERSION=$(sed -n -e 's/^Version: //p' "$TOP/$SDL_SOURCE_DIR/SDL2.spec")
 
-if [ -z "$AUTOBUILD" ] ; then
-    fail
-fi
-
-if [ "$OSTYPE" = "cygwin" ] ; then
-    export AUTOBUILD="$(cygpath -u $AUTOBUILD)"
-fi
+stage="$(pwd)"
 
 # load autbuild provided shell functions and variables
-set +x
-eval "$("$AUTOBUILD" source_environment)"
-set -x
-
-stage="$(pwd)"
+source_environment_tempfile="$stage/source_environment.sh"
+"$autobuild" source_environment > "$source_environment_tempfile"
+. "$source_environment_tempfile"
 
 # Restore all .sos
 restore_sos ()
@@ -36,6 +40,52 @@ restore_sos ()
 }
 
 case "$AUTOBUILD_PLATFORM" in
+    windows*)
+        load_vsvars
+
+        mkdir -p "$stage/include/SDL2"
+        mkdir -p "$stage/lib/debug"
+        mkdir -p "$stage/lib/release"
+
+        pushd "$TOP/$SDL_SOURCE_DIR"
+
+        mkdir -p "build_debug"
+        pushd "build_debug"
+            cmake .. -G "$AUTOBUILD_WIN_CMAKE_GEN" -A "$AUTOBUILD_WIN_VSPLATFORM" -DCMAKE_INSTALL_PREFIX=$(cygpath -m $stage)/debug
+        
+            cmake --build . --config Debug
+            cmake --install . --config Debug
+
+            # conditionally run unit tests
+            if [ "${DISABLE_UNIT_TESTS:-0}" = "0" ]; then
+                ctest -C Debug
+            fi
+
+            cp $stage/debug/bin/*.dll $stage/lib/debug/
+            cp $stage/debug/lib/*.lib $stage/lib/debug/
+        popd
+
+        mkdir -p "build_release"
+        pushd "build_release"
+            cmake .. -G "$AUTOBUILD_WIN_CMAKE_GEN" -A "$AUTOBUILD_WIN_VSPLATFORM" -DCMAKE_INSTALL_PREFIX=$(cygpath -m $stage)/release
+        
+            cmake --build . --config Release
+            cmake --install . --config Release
+
+            # conditionally run unit tests
+            if [ "${DISABLE_UNIT_TESTS:-0}" = "0" ]; then
+                ctest -C Release
+            fi
+    
+            cp $stage/release/bin/*.dll $stage/lib/release/
+            cp $stage/release/lib/*.lib $stage/lib/release/
+            cp $stage/release/include/SDL2/*.h $stage/include/SDL2/
+        popd
+
+        #cp -a {png.h,pngconf.h} "$stage/include/libpng16"
+
+        popd
+    ;;
     darwin*)
         # Setup osx sdk platform
         SDKNAME="macosx"
