@@ -145,8 +145,6 @@ case "$AUTOBUILD_PLATFORM" in
 
             cmake --build . --config Debug
             cmake --build . --config Debug --target install
-
-            cp -a Debug/*.dSYM $stage/lib/debug
         popd
 
         mkdir -p "build_release"
@@ -176,8 +174,6 @@ case "$AUTOBUILD_PLATFORM" in
 
             cmake --build . --config Release
             cmake --build . --config Release --target install
-
-            cp -a Release/*.dSYM $stage/lib/release
         popd
 
         popd
