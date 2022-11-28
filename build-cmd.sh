@@ -36,6 +36,36 @@ restore_sos ()
 }
 
 case "$AUTOBUILD_PLATFORM" in
+        windows*)
+            load_vsvars
+            mkdir -p "build_debug"
+            pushd "build_debug"
+                cmake .. -G "$AUTOBUILD_WIN_CMAKE_GEN" -A "$AUTOBUILD_WIN_VSPLATFORM" -DCMAKE_INSTALL_PREFIX=$(cygpath -m $stage)
+            
+                cmake --build . --config Debug --clean-first
+
+                # conditionally run unit tests
+                if [ "${DISABLE_UNIT_TESTS:-0}" = "0" ]; then
+                    ctest -C Debug
+                fi
+
+                #cp "Debug/libpng16_staticd.lib" "$stage/lib/debug/libpng16d.lib"
+            popd
+
+            mkdir -p "build_release"
+            pushd "build_release"
+                cmake .. -G "$AUTOBUILD_WIN_CMAKE_GEN" -A "$AUTOBUILD_WIN_VSPLATFORM" -DCMAKE_INSTALL_PREFIX=$(cygpath -m $stage)
+            
+                cmake --build . --config Release --clean-first
+
+                # conditionally run unit tests
+                if [ "${DISABLE_UNIT_TESTS:-0}" = "0" ]; then
+                    ctest -C Release
+                fi
+            popd
+
+            cp -a {png.h,pngconf.h} "$stage/include/libpng16"
+        ;;
     darwin*)
         # Setup osx sdk platform
         SDKNAME="macosx"
