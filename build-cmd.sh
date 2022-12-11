@@ -39,6 +39,8 @@ restore_sos ()
     done
 }
 
+pushd "$TOP/$SDL_SOURCE_DIR"
+
 case "$AUTOBUILD_PLATFORM" in
     windows*)
         load_vsvars
@@ -46,8 +48,6 @@ case "$AUTOBUILD_PLATFORM" in
         mkdir -p "$stage/include/SDL2"
         mkdir -p "$stage/lib/debug"
         mkdir -p "$stage/lib/release"
-
-        pushd "$TOP/$SDL_SOURCE_DIR"
 
         mkdir -p "build_debug"
         pushd "build_debug"
@@ -81,10 +81,6 @@ case "$AUTOBUILD_PLATFORM" in
             cp $stage/release/lib/*.lib $stage/lib/release/
             cp $stage/release/include/SDL2/*.h $stage/include/SDL2/
         popd
-
-        #cp -a {png.h,pngconf.h} "$stage/include/libpng16"
-
-        popd
     ;;
     darwin*)
         # Setup osx sdk platform
@@ -116,8 +112,6 @@ case "$AUTOBUILD_PLATFORM" in
         mkdir -p $PREFIX_DEBUG
         mkdir -p $PREFIX_RELEASE
 
-        pushd "$TOP/$SDL_SOURCE_DIR"
-
         mkdir -p "build_debug"
         pushd "build_debug"
             CFLAGS="$DEBUG_CFLAGS" \
@@ -136,6 +130,8 @@ case "$AUTOBUILD_PLATFORM" in
                 -DCMAKE_XCODE_ATTRIBUTE_CLANG_X86_VECTOR_INSTRUCTIONS=sse4.2 \
                 -DCMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD="c++17" \
                 -DCMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY="libc++" \
+                -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED="NO" \
+                -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED="NO" \
                 -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY="" \
                 -DCMAKE_OSX_ARCHITECTURES:STRING=x86_64 \
                 -DCMAKE_OSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET} \
@@ -143,7 +139,7 @@ case "$AUTOBUILD_PLATFORM" in
                 -DCMAKE_MACOSX_RPATH=YES -DCMAKE_INSTALL_PREFIX=$PREFIX_DEBUG
 
             cmake --build . --config Debug
-            cmake --build . --config Debug --target install
+            cmake --install . --config Debug
         popd
 
         mkdir -p "build_release"
@@ -164,6 +160,8 @@ case "$AUTOBUILD_PLATFORM" in
                 -DCMAKE_XCODE_ATTRIBUTE_CLANG_X86_VECTOR_INSTRUCTIONS=sse4.2 \
                 -DCMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD="c++17" \
                 -DCMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY="libc++" \
+                -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED="NO" \
+                -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED="NO" \
                 -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY="" \
                 -DCMAKE_OSX_ARCHITECTURES:STRING=x86_64 \
                 -DCMAKE_OSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET} \
@@ -171,9 +169,7 @@ case "$AUTOBUILD_PLATFORM" in
                 -DCMAKE_MACOSX_RPATH=YES -DCMAKE_INSTALL_PREFIX=$PREFIX_RELEASE
 
             cmake --build . --config Release
-            cmake --build . --config Release --target install
-        popd
-
+            cmake --install . --config Release
         popd
 
         cp -a $PREFIX_RELEASE/include/SDL2/*.* $stage/include/SDL2
@@ -220,7 +216,17 @@ case "$AUTOBUILD_PLATFORM" in
         RELEASE_CXXFLAGS="$RELEASE_COMMON_FLAGS -std=c++17"
         DEBUG_CPPFLAGS="-DPIC"
         RELEASE_CPPFLAGS="-DPIC"
-        
+
+        mkdir -p "$stage/include/SDL2"
+        mkdir -p "$stage/lib/debug"
+        mkdir -p "$stage/lib/release"
+
+        PREFIX_DEBUG="$stage/temp_debug"
+        PREFIX_RELEASE="$stage/temp_release"
+
+        mkdir -p $PREFIX_DEBUG
+        mkdir -p $PREFIX_RELEASE
+
         # Handle any deliberate platform targeting
         if [ -z "${TARGET_CPPFLAGS:-}" ]; then
             # Remove sysroot contamination from build environment
@@ -239,43 +245,48 @@ case "$AUTOBUILD_PLATFORM" in
             fi
         done
         
-        pushd "$TOP/$SDL_SOURCE_DIR"
-        ./autogen.sh
+        mkdir -p "build_debug"
+        pushd "build_debug"
+            CFLAGS="$DEBUG_CFLAGS" \
+            CXXFLAGS="$DEBUG_CXXFLAGS" \
+            CPPFLAGS="$DEBUG_CPPFLAGS" \
+            cmake .. -GNinja -DCMAKE_BUILD_TYPE="Debug" \
+                -DCMAKE_C_FLAGS="$DEBUG_CFLAGS" \
+                -DCMAKE_CXX_FLAGS="$DEBUG_CXXFLAGS" \
+                -DCMAKE_INSTALL_PREFIX=$PREFIX_DEBUG
 
-        # do debug build of sdl
-        PATH="$stage"/bin/:"$PATH" \
-        CFLAGS="$DEBUG_CFLAGS" \
-        CXXFLAGS="$DEBUG_CXXFLAGS" \
-        CPPFLAGS="$DEBUG_CPPFLAGS" \
-        LDFLAGS="$opts" \
-        ./configure --with-pic \
-        --prefix="$stage" --libdir="$stage/lib/debug" --includedir="$stage/include"
-        make -j$AUTOBUILD_CPU_COUNT
-        make install
-        
-        # clean the build tree
-        make distclean
-        
-        # do release build of sdl
-        PATH="$stage"/bin/:"$PATH" \
-        CFLAGS="$RELEASE_CFLAGS" \
-        CXXFLAGS="$RELEASE_CXXFLAGS" \
-        CPPFLAGS="$RELEASE_CPPFLAGS" \
-        LDFLAGS="$opts" \
-        ./configure --with-pic \
-        --prefix="$stage" --libdir="$stage/lib/release" --includedir="$stage/include"
-        make -j$AUTOBUILD_CPU_COUNT
-        make install
-        
-        # clean the build tree
-        make distclean
+            cmake --build . --config Debug
+            cmake --install . --config Debug
         popd
+
+        mkdir -p "build_release"
+        pushd "build_release"
+            CFLAGS="$RELEASE_CFLAGS" \
+            CXXFLAGS="$RELEASE_CXXFLAGS" \
+            CPPFLAGS="$RELEASE_CPPFLAGS" \
+            cmake .. -GNinja -DCMAKE_BUILD_TYPE="Release" \
+                -DCMAKE_C_FLAGS="$RELEASE_CFLAGS" \
+                -DCMAKE_CXX_FLAGS="$RELEASE_CXXFLAGS" \
+                -DCMAKE_INSTALL_PREFIX=$PREFIX_RELEASE
+
+            cmake --build . --config Release
+            cmake --install . --config Release
+        popd
+
+        cp -a $PREFIX_RELEASE/include/SDL2/*.* $stage/include/SDL2
+
+        cp -a $PREFIX_DEBUG/lib/*.so* $stage/lib/debug
+        cp -a $PREFIX_DEBUG/lib/libSDL2maind.a $stage/lib/debug
+
+        cp -a $PREFIX_RELEASE/lib/*.so* $stage/lib/release
+        cp -a $PREFIX_RELEASE/lib/libSDL2main.a $stage/lib/release
     ;;
     
     *)
         exit -1
     ;;
 esac
+popd
 
 
 mkdir -p "$stage/LICENSES"
