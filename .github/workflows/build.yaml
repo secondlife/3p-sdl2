@@ -1,0 +1,35 @@
+name: Build
+on:
+  pull_request:
+  push:
+    branches: [main, actions]
+    tags: ['v*']
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [windows-2022, macos-11, ubuntu-22.04]
+        addrsize: ["64"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Setup Linux Build Dependencies
+        if: ${{ runner.os == 'Linux' }}
+        run: sudo apt-get install ninja-build
+      - name: Setup macOS Build Dependencies
+        if: ${{ runner.os == 'macOS' }}
+        run: brew install ninja
+      - name: Setup Windows Build Dependencies
+        if: ${{ runner.os == 'Windows' }}
+        run: choco install ninja
+      - name: Build with autobuild
+        uses: secondlife/action-autobuild@v3
+        with:
+          addrsize: ${{ matrix.addrsize }}
+  release:
+    needs: build
+    runs-on: [ubuntu-latest]
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: secondlife/action-autobuild-release@v2
+        with:
+          public: true

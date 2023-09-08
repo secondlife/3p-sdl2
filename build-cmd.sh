@@ -52,7 +52,7 @@ case "$AUTOBUILD_PLATFORM" in
         mkdir -p "build_debug"
         pushd "build_debug"
             cmake .. -G "$AUTOBUILD_WIN_CMAKE_GEN" -A "$AUTOBUILD_WIN_VSPLATFORM" -DCMAKE_INSTALL_PREFIX=$(cygpath -m $stage)/debug
-        
+
             cmake --build . --config Debug
             cmake --install . --config Debug
 
@@ -68,7 +68,7 @@ case "$AUTOBUILD_PLATFORM" in
         mkdir -p "build_release"
         pushd "build_release"
             cmake .. -G "$AUTOBUILD_WIN_CMAKE_GEN" -A "$AUTOBUILD_WIN_VSPLATFORM" -DCMAKE_INSTALL_PREFIX=$(cygpath -m $stage)/release
-        
+
             cmake --build . --config Release
             cmake --install . --config Release
 
@@ -76,7 +76,7 @@ case "$AUTOBUILD_PLATFORM" in
             if [ "${DISABLE_UNIT_TESTS:-0}" = "0" ]; then
                 ctest -C Release
             fi
-    
+
             cp $stage/release/bin/*.dll $stage/lib/release/
             cp $stage/release/lib/*.lib $stage/lib/release/
             cp $stage/release/include/SDL2/*.h $stage/include/SDL2/
@@ -205,9 +205,9 @@ case "$AUTOBUILD_PLATFORM" in
         # but which do nonetheless.
         #
         unset DISTCC_HOSTS CC CXX CFLAGS CPPFLAGS CXXFLAGS
-        
+
         # Default target per autobuild build --address-size
-        opts="${TARGET_OPTS:--m$AUTOBUILD_ADDRSIZE}"
+        opts="${TARGET_OPTS:--m64}"
         DEBUG_COMMON_FLAGS="$opts -Og -g -fPIC -DPIC"
         RELEASE_COMMON_FLAGS="$opts -O3 -g -fPIC -DPIC -fstack-protector-strong -D_FORTIFY_SOURCE=2"
         DEBUG_CFLAGS="$DEBUG_COMMON_FLAGS"
@@ -235,7 +235,7 @@ case "$AUTOBUILD_PLATFORM" in
             # Incorporate special pre-processing flags
             export CPPFLAGS="$TARGET_CPPFLAGS"
         fi
-        
+
         # Force static linkage to libz by moving .sos out of the way
         # (Libz is only packaging statics right now but keep this working.)
         trap restore_sos EXIT
@@ -244,7 +244,7 @@ case "$AUTOBUILD_PLATFORM" in
                 mv -f "$solib" "$solib".disable
             fi
         done
-        
+
         mkdir -p "build_debug"
         pushd "build_debug"
             CFLAGS="$DEBUG_CFLAGS" \
@@ -281,7 +281,7 @@ case "$AUTOBUILD_PLATFORM" in
         cp -a $PREFIX_RELEASE/lib/*.so* $stage/lib/release
         cp -a $PREFIX_RELEASE/lib/libSDL2main.a $stage/lib/release
     ;;
-    
+
     *)
         exit -1
     ;;

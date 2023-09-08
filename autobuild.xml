@@ -44,7 +44,7 @@
           <key>name</key>
           <string>common</string>
         </map>
-        <key>darwin</key>
+        <key>darwin64</key>
         <map>
           <key>configurations</key>
           <map>
@@ -65,9 +65,9 @@
             <string>lib/debug/*.*</string>
           </array>
           <key>name</key>
-          <string>darwin</string>
+          <string>darwin64</string>
         </map>
-        <key>linux</key>
+        <key>linux64</key>
         <map>
           <key>configurations</key>
           <map>
@@ -88,9 +88,9 @@
             <string>lib/debug/*.so*</string>
           </array>
           <key>name</key>
-          <string>linux</string>
+          <string>linux64</string>
         </map>
-        <key>windows</key>
+        <key>windows64</key>
         <map>
           <key>configurations</key>
           <map>
@@ -111,7 +111,7 @@
             <string>lib/debug/*.*</string>
           </array>
           <key>name</key>
-          <string>windows</string>
+          <string>windows64</string>
         </map>
       </map>
       <key>version_file</key>
