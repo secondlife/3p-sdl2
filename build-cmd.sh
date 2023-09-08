@@ -207,7 +207,7 @@ case "$AUTOBUILD_PLATFORM" in
         unset DISTCC_HOSTS CC CXX CFLAGS CPPFLAGS CXXFLAGS
 
         # Default target per autobuild build --address-size
-        opts="${TARGET_OPTS:--m$AUTOBUILD_ADDRSIZE}"
+        opts="${TARGET_OPTS:--m64}"
         DEBUG_COMMON_FLAGS="$opts -Og -g -fPIC -DPIC"
         RELEASE_COMMON_FLAGS="$opts -O3 -g -fPIC -DPIC -fstack-protector-strong -D_FORTIFY_SOURCE=2"
         DEBUG_CFLAGS="$DEBUG_COMMON_FLAGS"
