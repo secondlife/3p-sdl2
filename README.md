@@ -9,9 +9,11 @@ hardware via OpenGL and Direct3D.
 
 # How to build:
 
-* Install [autobuild](https://wiki.secondlife.com/wiki/Autobuild).
-* <pre>autobuild configure</pre>
-* <pre>autobuild build</pre>
-* <pre>autobuild package</pre>
+* Install [autobuild](https://wiki.secondlife.com/wiki/Autobuild) utility.
+* Invoke autobuild at the command line:
+<pre>
+        autobuild build
+        autobuild package
+</pre>
 
-That will produce a bundled asset of SDL2 libs and header files called something like: <pre>SDL2-2.24.1-linux-012345678.tar.bz2</pre>.
+That will produce a bundled asset of SDL2 libs and header files called something like: `SDL2-2.24.1-linux-012345678.tar.bz2`
