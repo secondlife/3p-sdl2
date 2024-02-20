@@ -16,7 +16,11 @@ jobs:
         if: ${{ runner.os == 'Linux' }}
         run: sudo apt-get install ninja-build
 
-      - name: Run apt upgrade
+      - name: Run apt update
+        if: runner.os == 'Linux'
+        run: sudo apt upgrade
+
+      - name: Run apt update
         if: runner.os == 'Linux'
         run: sudo apt upgrade
         
