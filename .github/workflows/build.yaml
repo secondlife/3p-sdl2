@@ -15,6 +15,10 @@ jobs:
       - name: Setup Linux Build Dependencies
         if: ${{ runner.os == 'Linux' }}
         run: sudo apt-get install ninja-build
+
+      - name: Run apt upgrade
+        if: runner.os == 'Linux'
+        run: sudo apt upgrade
         
       - name: Install required Linux packages
         if: runner.os == 'Linux'
