@@ -15,12 +15,23 @@ jobs:
       - name: Setup Linux Build Dependencies
         if: ${{ runner.os == 'Linux' }}
         run: sudo apt-get install ninja-build
+        
+      - name: Install required Linux packages
+        if: runner.os == 'Linux'
+        run: >
+          sudo apt install -y mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev 
+          libxext-dev libibus-1.0-dev
+          fcitx-libs-dev libudev-dev libunwind-dev 
+          libwayland-dev libxkbcommon-dev libpulse-dev libsndio-dev
+          
       - name: Setup macOS Build Dependencies
         if: ${{ runner.os == 'macOS' }}
         run: brew install ninja
+
       - name: Setup Windows Build Dependencies
         if: ${{ runner.os == 'Windows' }}
         run: choco install ninja
+      
       - name: Build with autobuild
         uses: secondlife/action-autobuild@v3
         with:
