@@ -13,24 +13,12 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Setup Linux Build Dependencies
-        if: ${{ runner.os == 'Linux' }}
-        run: sudo apt-get install ninja-build
-
-      - name: Run apt update
-        if: runner.os == 'Linux'
-        run: sudo apt update
-
-      - name: Run apt update
-        if: runner.os == 'Linux'
-        run: sudo apt upgrade
-        
-      - name: Install required Linux packages
         if: runner.os == 'Linux'
         run: >
           sudo apt install -y mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev 
           libxext-dev libibus-1.0-dev
           fcitx-libs-dev libudev-dev libunwind-dev 
-          libwayland-dev libxkbcommon-dev libpulse-dev libsndio-dev
+          libwayland-dev libxkbcommon-dev libpulse-dev libsndio-dev ninja-build
           
       - name: Setup macOS Build Dependencies
         if: ${{ runner.os == 'macOS' }}
