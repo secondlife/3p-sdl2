@@ -12,6 +12,10 @@ jobs:
         addrsize: ["64"]
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Update apt
+        if: runner.os == 'Linux'
+        run: sudo apt update
+
       - name: Setup Linux Build Dependencies
         if: runner.os == 'Linux'
         run: >
