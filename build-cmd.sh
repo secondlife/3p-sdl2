@@ -20,7 +20,6 @@ fi
 TOP="$(dirname "$0")"
 
 SDL_SOURCE_DIR="SDL2"
-SDL_VERSION=$(sed -n -e 's/^Version: //p' "$TOP/$SDL_SOURCE_DIR/SDL2.spec")
 
 stage="$(pwd)"
 
@@ -288,6 +287,7 @@ case "$AUTOBUILD_PLATFORM" in
 esac
 popd
 
+SDL_VERSION=$(sed -n -e 's/^Version: //p' "$TOP/$SDL_SOURCE_DIR/build_release/SDL2.spec")
 
 mkdir -p "$stage/LICENSES"
 cp "$TOP/$SDL_SOURCE_DIR/LICENSE.txt" "$stage/LICENSES/SDL2.txt"
