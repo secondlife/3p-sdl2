@@ -33,7 +33,7 @@ jobs:
         run: choco install ninja
       
       - name: Build with autobuild
-        uses: secondlife/action-autobuild@v3
+        uses: secondlife/action-autobuild@v4
         with:
           addrsize: ${{ matrix.addrsize }}
   release:
