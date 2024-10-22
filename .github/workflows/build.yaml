@@ -8,29 +8,26 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [windows-2022, macos-12, ubuntu-22.04]
+        os: [windows-2022, macos-14, ubuntu-22.04]
         addrsize: ["64"]
     runs-on: ${{ matrix.os }}
     steps:
-      - name: Update apt
-        if: runner.os == 'Linux'
-        run: sudo apt update
-
       - name: Setup Linux Build Dependencies
-        if: runner.os == 'Linux'
-        run: >
-          sudo apt install -y mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev 
-          libxext-dev libibus-1.0-dev
-          fcitx-libs-dev libudev-dev libunwind-dev 
-          libwayland-dev libxkbcommon-dev libpulse-dev ninja-build
+        if: runner.os == 'linux'
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt update
+          sudo apt install -y \
+            mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev libegl1-mesa-dev libvulkan-dev \
+            libxext-dev libxrandr-dev libxfixes-dev libxcursor-dev libxss-dev libxi-dev libxkbcommon-dev \
+            libwayland-dev libdecor-0-dev libdbus-1-dev libibus-1.0-dev fcitx-libs-dev \
+            libudev-dev libunwind-dev libdirectfb-dev libasound2-dev libpulse-dev \
+            libpipewire-0.3-dev ninja-build
           
       - name: Setup macOS Build Dependencies
         if: ${{ runner.os == 'macOS' }}
         run: brew install ninja
-
-      - name: Setup Windows Build Dependencies
-        if: ${{ runner.os == 'Windows' }}
-        run: choco install ninja
       
       - name: Build with autobuild
         uses: secondlife/action-autobuild@v4
