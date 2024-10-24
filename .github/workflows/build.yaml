@@ -22,7 +22,7 @@ jobs:
           sudo apt install -y mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev 
           libxext-dev libibus-1.0-dev
           fcitx-libs-dev libudev-dev libunwind-dev 
-          libwayland-dev libxkbcommon-dev libpulse-dev ninja-build
+          libwayland-dev libxkbcommon-dev libpulse-dev ninja-build libdecor-0-dev
           
       - name: Setup macOS Build Dependencies
         if: ${{ runner.os == 'macOS' }}
