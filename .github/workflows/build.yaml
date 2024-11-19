@@ -8,7 +8,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [windows-2022, macos-14, ubuntu-22.04]
+        os: [windows-2022, macos-15, ubuntu-22.04]
         addrsize: ["64"]
     runs-on: ${{ matrix.os }}
     steps:
@@ -24,13 +24,13 @@ jobs:
             libwayland-dev libdecor-0-dev libdbus-1-dev libibus-1.0-dev fcitx-libs-dev \
             libudev-dev libunwind-dev libdirectfb-dev libasound2-dev libpulse-dev \
             libpipewire-0.3-dev ninja-build
-          
+
       - name: Setup macOS Build Dependencies
         if: ${{ runner.os == 'macOS' }}
         run: brew install ninja
-      
+
       - name: Build with autobuild
-        uses: secondlife/action-autobuild@v4
+        uses: secondlife/action-autobuild@v5
         with:
           addrsize: ${{ matrix.addrsize }}
   release:
