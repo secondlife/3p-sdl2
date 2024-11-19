@@ -83,8 +83,6 @@ case "$AUTOBUILD_PLATFORM" in
             cp $stage/release/lib/*.lib $stage/lib/release/
             cp $stage/release/include/SDL2/*.h $stage/include/SDL2/
         popd
-
-        SDL_VERSION=$(sed -n -e 's/^Version: //p' "$TOP/$SDL_SOURCE_DIR/build_release/SDL2.spec")
     ;;
     darwin*)
         export MACOSX_DEPLOYMENT_TARGET="$LL_BUILD_DARWIN_DEPLOY_TARGET"
@@ -125,8 +123,6 @@ case "$AUTOBUILD_PLATFORM" in
             dsymutil libSDL2.dylib
             strip -x -S libSDL2.dylib
         popd
-
-        SDL_VERSION=$(sed -n -e 's/^Version: //p' "$TOP/$SDL_SOURCE_DIR/build_arm64/SDL2.spec")
         ;;
     linux*)
         # Default target per autobuild build --address-size
@@ -152,8 +148,6 @@ case "$AUTOBUILD_PLATFORM" in
         cp -a $PREFIX_RELEASE/include/SDL2/*.* $stage/include/SDL2
         cp -a $PREFIX_RELEASE/lib/*.so* $stage/lib/release
         cp -a $PREFIX_RELEASE/lib/libSDL2main.a $stage/lib/release
-
-        SDL_VERSION=$(sed -n -e 's/^Version: //p' "$TOP/$SDL_SOURCE_DIR/build_release/SDL2.spec")
     ;;
 
     *)
@@ -164,4 +158,3 @@ popd
 
 mkdir -p "$stage/LICENSES"
 cp "$TOP/$SDL_SOURCE_DIR/LICENSE.txt" "$stage/LICENSES/SDL2.txt"
-echo "$SDL_VERSION" > "$stage/VERSION.txt"
