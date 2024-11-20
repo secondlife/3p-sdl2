@@ -85,38 +85,42 @@ case "$AUTOBUILD_PLATFORM" in
         popd
     ;;
     darwin*)
-        # Setup osx sdk platform
         export MACOSX_DEPLOYMENT_TARGET="$LL_BUILD_DARWIN_DEPLOY_TARGET"
 
-        # Setup build flags
-        opts="${TARGET_OPTS:--arch $AUTOBUILD_CONFIGURE_ARCH $LL_BUILD_RELEASE}"
+        for arch in x86_64 arm64 ; do
+            ARCH_ARGS="-arch $arch"
+            opts="${TARGET_OPTS:-$ARCH_ARGS $LL_BUILD_RELEASE}"
+            cc_opts="$(remove_cxxstd $opts)"
+            ld_opts="$ARCH_ARGS"
 
-        mkdir -p "$stage/include/SDL2"
-        mkdir -p "$stage/lib/release"
+            mkdir -p "build_$arch"
+            pushd "build_$arch"
+                CFLAGS="$cc_opts" \
+                CXXFLAGS="$opts" \
+                LDFLAGS="$ld_opts" \
+                cmake .. -GNinja -DCMAKE_BUILD_TYPE="Release" \
+                    -DCMAKE_C_FLAGS="$cc_opts" \
+                    -DCMAKE_CXX_FLAGS="$opts" \
+                    -DCMAKE_OSX_ARCHITECTURES:STRING="$arch" \
+                    -DCMAKE_OSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET} \
+                    -DCMAKE_MACOSX_RPATH=YES \
+                    -DCMAKE_INSTALL_PREFIX="$stage" \
+                    -DCMAKE_INSTALL_LIBDIR="$stage/lib/release/$arch"
 
-        PREFIX_RELEASE="$stage/temp_release"
-        mkdir -p $PREFIX_RELEASE
+                cmake --build . --config Release
+                cmake --install . --config Release
+            popd
+        done
 
-        mkdir -p "build_release"
-        pushd "build_release"
-            cmake .. -GNinja -DCMAKE_BUILD_TYPE="Release" \
-                -DCMAKE_C_FLAGS="$(remove_cxxstd $opts)" \
-                -DCMAKE_CXX_FLAGS="$opts" \
-                -DCMAKE_OSX_ARCHITECTURES:STRING=x86_64 \
-                -DCMAKE_OSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET} \
-                -DCMAKE_MACOSX_RPATH=YES \
-                -DCMAKE_INSTALL_PREFIX=$PREFIX_RELEASE
 
-            cmake --build . --config Release
-            cmake --install . --config Release
-        popd
-
-        cp -a $PREFIX_RELEASE/include/SDL2/*.* $stage/include/SDL2
-        cp -a $PREFIX_RELEASE/lib/*.dylib* $stage/lib/release
-        cp -a $PREFIX_RELEASE/lib/libSDL2main.a $stage/lib/release
+        # create universal libraries
+        lipo -create -output ${stage}/lib/release/libSDL2.dylib ${stage}/lib/release/x86_64/libSDL2.dylib ${stage}/lib/release/arm64/libSDL2.dylib
+        lipo -create -output ${stage}/lib/release/libSDL2_test.a ${stage}/lib/release/x86_64/libSDL2_test.a ${stage}/lib/release/arm64/libSDL2_test.a
+        lipo -create -output ${stage}/lib/release/libSDL2main.a ${stage}/lib/release/x86_64/libSDL2main.a ${stage}/lib/release/arm64/libSDL2main.a
 
         pushd "${stage}/lib/release"
-            fix_dylib_id "libSDL2.dylib"
+            install_name_tool -id "@rpath/libSDL2.dylib" "libSDL2.dylib"
+            dsymutil libSDL2.dylib
             strip -x -S libSDL2.dylib
         popd
         ;;
@@ -152,8 +156,5 @@ case "$AUTOBUILD_PLATFORM" in
 esac
 popd
 
-SDL_VERSION=$(sed -n -e 's/^Version: //p' "$TOP/$SDL_SOURCE_DIR/build_release/SDL2.spec")
-
 mkdir -p "$stage/LICENSES"
 cp "$TOP/$SDL_SOURCE_DIR/LICENSE.txt" "$stage/LICENSES/SDL2.txt"
-echo "$SDL_VERSION" > "$stage/VERSION.txt"
